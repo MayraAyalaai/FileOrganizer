@@ -24,7 +24,33 @@ def main():
         return
     
     print(f"Scanning directory: {target_dir}")
-    # TODO: Implement file scanning logic
+    
+    scan_files(target_dir)
+
+
+def scan_files(directory):
+    """Scan directory and list all files with basic info"""
+    file_count = 0
+    
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            file_path = os.path.join(root, file)
+            try:
+                file_size = os.path.getsize(file_path)
+                file_ext = os.path.splitext(file)[1].lower()
+                
+                print(f"File: {file}")
+                print(f"  Path: {file_path}")
+                print(f"  Size: {file_size} bytes")
+                print(f"  Extension: {file_ext if file_ext else 'No extension'}")
+                print("---")
+                
+                file_count += 1
+                
+            except (OSError, IOError) as e:
+                print(f"Error accessing file {file_path}: {e}")
+    
+    print(f"\nTotal files scanned: {file_count}")
     
 
 if __name__ == "__main__":
