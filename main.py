@@ -6,6 +6,7 @@ Author: LauraFergu
 
 import os
 import sys
+from datetime import datetime
 
 
 def main():
@@ -28,9 +29,29 @@ def main():
     scan_files(target_dir)
 
 
+def get_file_category(extension):
+    """Categorize files based on extension"""
+    categories = {
+        'images': ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg', '.webp'],
+        'documents': ['.pdf', '.doc', '.docx', '.txt', '.rtf', '.odt'],
+        'videos': ['.mp4', '.avi', '.mkv', '.mov', '.wmv', '.flv'],
+        'audio': ['.mp3', '.wav', '.flac', '.aac', '.ogg'],
+        'archives': ['.zip', '.rar', '.7z', '.tar', '.gz'],
+        'code': ['.py', '.js', '.html', '.css', '.cpp', '.java', '.c'],
+        'spreadsheets': ['.xls', '.xlsx', '.csv', '.ods']
+    }
+    
+    for category, extensions in categories.items():
+        if extension in extensions:
+            return category
+    
+    return 'other'
+
+
 def scan_files(directory):
     """Scan directory and list all files with basic info"""
     file_count = 0
+    categories = {}
     
     for root, dirs, files in os.walk(directory):
         for file in files:
@@ -38,11 +59,17 @@ def scan_files(directory):
             try:
                 file_size = os.path.getsize(file_path)
                 file_ext = os.path.splitext(file)[1].lower()
+                category = get_file_category(file_ext)
+                
+                if category not in categories:
+                    categories[category] = 0
+                categories[category] += 1
                 
                 print(f"File: {file}")
                 print(f"  Path: {file_path}")
                 print(f"  Size: {file_size} bytes")
                 print(f"  Extension: {file_ext if file_ext else 'No extension'}")
+                print(f"  Category: {category}")
                 print("---")
                 
                 file_count += 1
@@ -51,6 +78,9 @@ def scan_files(directory):
                 print(f"Error accessing file {file_path}: {e}")
     
     print(f"\nTotal files scanned: {file_count}")
+    print("\nFiles by category:")
+    for category, count in sorted(categories.items()):
+        print(f"  {category}: {count} files")
     
 
 if __name__ == "__main__":
