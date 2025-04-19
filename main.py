@@ -6,27 +6,34 @@ Author: LauraFergu
 
 import os
 import sys
+import argparse
 from datetime import datetime
 
 
 def main():
     """Main entry point for FileOrganizer"""
-    print("FileOrganizer v0.1.0")
-    print("Smart file organization tool")
+    parser = argparse.ArgumentParser(
+        description="FileOrganizer - A smart file organization tool",
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     
-    if len(sys.argv) < 2:
-        print("Usage: python main.py <directory>")
+    parser.add_argument("directory", help="Directory to scan and organize")
+    parser.add_argument("-v", "--verbose", action="store_true", 
+                       help="Show detailed file information")
+    parser.add_argument("-s", "--summary", action="store_true",
+                       help="Show only category summary")
+    parser.add_argument("--version", action="version", version="FileOrganizer v0.2.0")
+    
+    args = parser.parse_args()
+    
+    if not os.path.exists(args.directory):
+        print(f"Error: Directory '{args.directory}' does not exist")
         return
     
-    target_dir = sys.argv[1]
+    print(f"FileOrganizer v0.2.0")
+    print(f"Scanning directory: {args.directory}")
     
-    if not os.path.exists(target_dir):
-        print(f"Error: Directory '{target_dir}' does not exist")
-        return
-    
-    print(f"Scanning directory: {target_dir}")
-    
-    scan_files(target_dir)
+    scan_files(args.directory, verbose=args.verbose, summary_only=args.summary)
 
 
 def get_file_category(extension):
@@ -48,10 +55,11 @@ def get_file_category(extension):
     return 'other'
 
 
-def scan_files(directory):
+def scan_files(directory, verbose=False, summary_only=False):
     """Scan directory and list all files with basic info"""
     file_count = 0
     categories = {}
+    total_size = 0
     
     for root, dirs, files in os.walk(directory):
         for file in files:
@@ -64,21 +72,29 @@ def scan_files(directory):
                 if category not in categories:
                     categories[category] = 0
                 categories[category] += 1
+                total_size += file_size
                 
-                print(f"File: {file}")
-                print(f"  Path: {file_path}")
-                print(f"  Size: {file_size} bytes")
-                print(f"  Extension: {file_ext if file_ext else 'No extension'}")
-                print(f"  Category: {category}")
-                print("---")
+                if not summary_only:
+                    if verbose:
+                        print(f"File: {file}")
+                        print(f"  Path: {file_path}")
+                        print(f"  Size: {file_size} bytes")
+                        print(f"  Extension: {file_ext if file_ext else 'No extension'}")
+                        print(f"  Category: {category}")
+                        print("---")
+                    else:
+                        print(f"{file} [{category}]")
                 
                 file_count += 1
                 
             except (OSError, IOError) as e:
-                print(f"Error accessing file {file_path}: {e}")
+                if not summary_only:
+                    print(f"Error accessing file {file_path}: {e}")
     
-    print(f"\nTotal files scanned: {file_count}")
-    print("\nFiles by category:")
+    print(f"\nScan Results:")
+    print(f"Total files: {file_count}")
+    print(f"Total size: {total_size:,} bytes ({total_size/1024/1024:.1f} MB)")
+    print(f"\nFiles by category:")
     for category, count in sorted(categories.items()):
         print(f"  {category}: {count} files")
     
