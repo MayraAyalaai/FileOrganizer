@@ -8,6 +8,7 @@ import os
 import sys
 import argparse
 from datetime import datetime
+from config import Config
 
 
 def main():
@@ -22,7 +23,9 @@ def main():
                        help="Show detailed file information")
     parser.add_argument("-s", "--summary", action="store_true",
                        help="Show only category summary")
-    parser.add_argument("--version", action="version", version="FileOrganizer v0.2.0")
+    parser.add_argument("-c", "--config", default="config.json",
+                       help="Path to configuration file")
+    parser.add_argument("--version", action="version", version="FileOrganizer v0.3.0")
     
     args = parser.parse_args()
     
@@ -30,23 +33,18 @@ def main():
         print(f"Error: Directory '{args.directory}' does not exist")
         return
     
-    print(f"FileOrganizer v0.2.0")
+    # Load configuration
+    config = Config(args.config)
+    
+    print(f"FileOrganizer v0.3.0")
     print(f"Scanning directory: {args.directory}")
     
-    scan_files(args.directory, verbose=args.verbose, summary_only=args.summary)
+    scan_files(args.directory, config, verbose=args.verbose, summary_only=args.summary)
 
 
-def get_file_category(extension):
-    """Categorize files based on extension"""
-    categories = {
-        'images': ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg', '.webp'],
-        'documents': ['.pdf', '.doc', '.docx', '.txt', '.rtf', '.odt'],
-        'videos': ['.mp4', '.avi', '.mkv', '.mov', '.wmv', '.flv'],
-        'audio': ['.mp3', '.wav', '.flac', '.aac', '.ogg'],
-        'archives': ['.zip', '.rar', '.7z', '.tar', '.gz'],
-        'code': ['.py', '.js', '.html', '.css', '.cpp', '.java', '.c'],
-        'spreadsheets': ['.xls', '.xlsx', '.csv', '.ods']
-    }
+def get_file_category(extension, config):
+    """Categorize files based on extension using config"""
+    categories = config.get_categories()
     
     for category, extensions in categories.items():
         if extension in extensions:
@@ -55,7 +53,7 @@ def get_file_category(extension):
     return 'other'
 
 
-def scan_files(directory, verbose=False, summary_only=False):
+def scan_files(directory, config, verbose=False, summary_only=False):
     """Scan directory and list all files with basic info"""
     file_count = 0
     categories = {}
@@ -67,7 +65,7 @@ def scan_files(directory, verbose=False, summary_only=False):
             try:
                 file_size = os.path.getsize(file_path)
                 file_ext = os.path.splitext(file)[1].lower()
-                category = get_file_category(file_ext)
+                category = get_file_category(file_ext, config)
                 
                 if category not in categories:
                     categories[category] = 0
