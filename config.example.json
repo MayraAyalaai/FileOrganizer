@@ -1,0 +1,16 @@
+{
+  "categories": {
+    "images": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".tiff"],
+    "documents": [".pdf", ".doc", ".docx", ".txt", ".rtf", ".odt", ".pages"],
+    "videos": [".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".webm"],
+    "audio": [".mp3", ".wav", ".flac", ".aac", ".ogg", ".m4a"],
+    "archives": [".zip", ".rar", ".7z", ".tar", ".gz", ".bz2"],
+    "code": [".py", ".js", ".html", ".css", ".cpp", ".java", ".c", ".php", ".rb"],
+    "spreadsheets": [".xls", ".xlsx", ".csv", ".ods", ".numbers"],
+    "presentations": [".ppt", ".pptx", ".odp", ".key"],
+    "ebooks": [".epub", ".mobi", ".azw", ".azw3"]
+  },
+  "ignore_hidden": true,
+  "ignore_patterns": [".git", ".DS_Store", "Thumbs.db", ".gitignore"],
+  "max_depth": -1
+}
